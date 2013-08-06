@@ -1,0 +1,21 @@
+{
+    "manifest_version": 2,
+    "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'; frame-src 'self' http://211.151.146.142",
+    "update_url": "https://clients2.google.com/service/update2/crx",
+    "name": "HITFMsc",
+    "version": "0.2.0",
+    "description": "HITFM 北京 FM88.7 / 上海 FM87.9 / 广州 FM88.5",
+    "icons": {
+        "48": "img/icon48.png",
+        "128": "img/icon128.png"
+    },
+    "browser_action": {
+        "default_icon": "img/icon.png",
+        "default_title": "HITFM 北京FM88.7/上海FM87.9/广州FM88.5"
+    },
+    "background": {
+        "page": "background.html"
+    },
+    "options_page": "options.html"
+}
+
