@@ -1,6 +1,6 @@
 console.log = function() {}
 
-var parent_url = 'chrome-extension://gcdebpifkijpiijponofaohmdhahleel/background.html';
+var parent_url = 'chrome-extension://ldihbnchbmhhcbffhkgccdgnmidehgoc/background.html';
 var state_interval_id = null;
 var last_pos = 0;
 var player = null;
