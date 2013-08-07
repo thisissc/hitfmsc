@@ -1,9 +1,31 @@
 console.log = function() {}
 
-var parent_url = 'chrome-extension://ldihbnchbmhhcbffhkgccdgnmidehgoc/background.html';
+var parent_url = null;
 var state_interval_id = null;
 var last_pos = 0;
 var player = null;
+
+function parse_qs() {
+    var params = {};
+    var query = unescape(location.search.substring(1));
+    if (query.length > 0) {
+        var vars = query.split('&');
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split('=');
+            params[pair[0]] = pair[1];
+        }
+    }
+    return params;
+}
+
+function gen_parent_url() {
+    var params = parse_qs();
+    var extid = params.extid;
+    if (extid == undefined) {
+        extid = 'ldihbnchbmhhcbffhkgccdgnmidehgoc';
+    }
+    return 'chrome-extension://' + extid + '/background.html';
+}
 
 function play() {
     onplaying();
@@ -81,6 +103,7 @@ function checkstate() {
 
 document.addEventListener('DOMContentLoaded', function () {
     player = document.getElementById('mplayer');
+    parent_url = gen_parent_url();
     window.onhashchange = hashchanged;
     hashchanged();
 });

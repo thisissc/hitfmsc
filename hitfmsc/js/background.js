@@ -16,7 +16,7 @@ var audio = {
     play: function() {
         console.log('++> play');
         if (this._frame == null) {
-            this.player.html('<iframe id="embed_player_frame" src="' + this._frame_url + '"></iframe>');
+            this.player.html('<iframe id="embed_player_frame" src="' + this._frame_url + '#play"></iframe>');
             this._frame = $('#embed_player_frame')[0];
         }
         this._frame.src = this._frame_url + '#play';
@@ -75,7 +75,7 @@ var audio = {
     state: null,
     _bage_interval: null,
     _frame: null,
-    _frame_url: 'http://thisissc.sinaapp.com/static/embed_player.html',
+    _frame_url: 'http://thisissc.sinaapp.com/static/embed_player.html?extid=' + chrome.runtime.id,
 };
 
 
