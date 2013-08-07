@@ -1,4 +1,4 @@
 #!/bin/sh
 rm -rf hitfmsc.zip
-zip -r hitfmsc.zip *.html manifest.json img js
+zip -r /tmp/hitfmsc.zip *.html manifest.json img js
 

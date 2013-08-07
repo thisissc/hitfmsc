@@ -1,109 +1,108 @@
-// google analytics
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-42723420-1']);
-_gaq.push(['_trackPageview']);
+var console = chrome.extension.getBackgroundPage().console;
+console.log = function() {}
 
-(function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = 'https://ssl.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
-
-// player
-var audio = new Audio();
-var intervalId = null;
-var audio_status_code = {
+var audio_state_code = {
     PLAYING: 1,
-    LOADING: 0,
+    WAITING: 0,
     STOP: -1,
     ERROR: -2
-}
-var audio_status = audio_status_code.STOP;
+};
 
-function play() {
-    var src = 'http://58.68.255.152/hitfm.mp3';
-    if (audio.src != src) {
-        audio.src = src;
-    }
-    audio.play();
-    audio_status = audio_status_code.PLAYING;
-    set_badge();
-}
+var audio = {
+    init: function() {
+        this.player = $('#player');
+        this.set_state(audio_state_code.STOP);
+    },
+    play: function() {
+        console.log('++> play');
+        if (this._frame == null) {
+            this.player.html('<iframe id="embed_player_frame" src="' + this._frame_url + '"></iframe>');
+            this._frame = $('#embed_player_frame')[0];
+        }
+        this._frame.src = this._frame_url + '#play';
+        this.set_state(audio_state_code.PLAYING);
+    },
+    pause: function() {
+        console.log('++> pause');
+        this._frame.src = this._frame_url + '#pause';
+        this.set_state(audio_state_code.STOP);
+    },
+    error: function() {
+        console.log('++> error');
+        this._frame.src = this._frame_url + '#pause';
+        this.set_state(audio_state_code.ERROR);
+    },
+    set_state: function(state_code) {
+        this.state = state_code;
 
-function pause() {
-    audio.pause();
-    audio.src = "";
-    audio_status = audio_status_code.STOP;
-    set_badge();
-}
+        var C_GREEN = '#00FF00';
+        var C_YELLOW = '#FFFF00';
+        var C_RED = '#FF0000';
 
-function error() {
-    audio.src = "";
-    audio_status = audio_status_code.ERROR;
-    set_badge();
-}
+        window.clearInterval(this._bage_interval);
+        switch (this.state) {
+            case audio_state_code.PLAYING:
+                chrome.browserAction.setBadgeBackgroundColor({color: C_GREEN});
+                chrome.browserAction.setBadgeText({text: ' '});
+                break;
+            case audio_state_code.WAITING:
+                chrome.browserAction.setBadgeBackgroundColor({color: C_GREEN});
+                chrome.browserAction.setBadgeText({text: ' '});
 
-function set_badge() {
-    var C_GREEN = '#00FF00';
-    var C_YELLOW = '#FFFF00';
-    var C_RED = '#FF0000';
+                var _self = this;
+                var i = 0;
+                this._bage_interval = window.setInterval(function (){
+                    chrome.browserAction.setBadgeBackgroundColor({color: i%2==0?C_YELLOW:C_GREEN});
+                    i++;
 
-    window.clearInterval(intervalId);
-    switch (audio_status) {
-        case audio_status_code.PLAYING:
-            chrome.browserAction.setBadgeBackgroundColor({color: C_GREEN});
-            chrome.browserAction.setBadgeText({text: ' '});
-            break;
-        case audio_status_code.LOADING:
-            chrome.browserAction.setBadgeBackgroundColor({color: C_GREEN});
-            chrome.browserAction.setBadgeText({text: ' '});
+                    if (i > 200) {
+                        _self.error();
+                    }
+                }, 600);
 
-            var i = 0;
-            intervalId = window.setInterval(function (){
-                chrome.browserAction.setBadgeBackgroundColor({color: i%2==0?C_YELLOW:C_GREEN});
-                i++;
+                break;
+            case audio_state_code.ERROR:
+                chrome.browserAction.setBadgeBackgroundColor({color: C_RED});
+                chrome.browserAction.setBadgeText({text: ' '});
+                break;
+            case audio_state_code.STOP:
+            default:
+                chrome.browserAction.setBadgeText({text: ''});
+                chrome.browserAction.setBadgeBackgroundColor({color: C_GREEN});
+                break;
+        }
+    },
+    state: null,
+    _bage_interval: null,
+    _frame: null,
+    _frame_url: 'http://thisissc.sinaapp.com/static/embed_player.html',
+};
 
-                if (i > 500) {
-                    error();
-                }
-            }, 600);
-
-            break;
-        case audio_status_code.ERROR:
-            chrome.browserAction.setBadgeBackgroundColor({color: C_RED});
-            chrome.browserAction.setBadgeText({text: ' '});
-            break;
-        case audio_status_code.STOP:
-        default:
-            chrome.browserAction.setBadgeText({text: ''});
-            chrome.browserAction.setBadgeBackgroundColor({color: C_GREEN});
-            break;
-    }
-}
-
-function onAudioWaiting() {
-    audio_status = audio_status_code.LOADING;
-    set_badge();
-}
-
-function onAudioPlaying() {
-    window.clearInterval(intervalId);
-    audio_status = audio_status_code.PLAYING;
-    set_badge();
-}
 
 function toggle_click() {
-    if (audio_status != audio_status_code.STOP) {
-        pause();
+    if (audio.state != audio_state_code.STOP) {
+        audio.pause();
         _gaq.push(['_trackEvent', 'Audios', 'Pause', 'Click to pause']);
     } else {
-        play();
+        audio.play();
         _gaq.push(['_trackEvent', 'Audios', 'Play', 'Click to play']);
     }
 }
 
-audio.addEventListener('waiting', onAudioWaiting);
-audio.addEventListener('playing', onAudioPlaying);
-chrome.browserAction.onClicked.addListener(toggle_click);
-set_badge();
+function onhashchanged() {
+    var h = location.hash;
+
+    if (h == '#waiting') {
+        audio.set_state(audio_state_code.WAITING);
+    } else if (h == '#playing') {
+        audio.set_state(audio_state_code.PLAYING);
+    }
+}
+
+
+$(function() {
+    audio.init();
+    chrome.browserAction.onClicked.addListener(toggle_click);
+    window.onhashchange = onhashchanged;
+});
 
