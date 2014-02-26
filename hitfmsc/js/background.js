@@ -82,10 +82,10 @@ var audio = {
 function toggle_click() {
     if (audio.state != audio_state_code.STOP) {
         audio.pause();
-        _gaq.push(['_trackEvent', 'Audios', 'Pause', 'Click to pause']);
+        ga('send', 'event', 'Audios', 'Pause', 'Click to pause');
     } else {
         audio.play();
-        _gaq.push(['_trackEvent', 'Audios', 'Play', 'Click to play']);
+        ga('send', 'event', 'Audios', 'Play', 'Click to play');
     }
 }
 
