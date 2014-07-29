@@ -75,7 +75,7 @@ var audio = {
     state: null,
     _bage_interval: null,
     _frame: null,
-    _frame_url: 'http://thisissc.sinaapp.com/static/embed_player.html?extid=' + chrome.runtime.id,
+    _frame_url: 'http://thisj.com/static/embed_player.html?extid=' + chrome.runtime.id,
 };
 
 

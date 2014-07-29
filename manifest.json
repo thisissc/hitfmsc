@@ -3,7 +3,7 @@
     "content_security_policy": "script-src 'self' chrome-extension://ldihbnchbmhhcbffhkgccdgnmidehgoc/js/; object-src 'self'; frame-src 'self' http://thisissc.sinaapp.com",
     "update_url": "https://clients2.google.com/service/update2/crx",
     "name": "HITFMsc",
-    "version": "0.2.9",
+    "version": "0.2.10",
     "description": "HITFM 北京 FM88.7 / 上海 FM87.9 / 广州 FM88.5",
     "icons": {
         "48": "img/icon48.png",
